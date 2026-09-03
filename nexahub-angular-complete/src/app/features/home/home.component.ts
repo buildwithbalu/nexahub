@@ -20,20 +20,6 @@ import { RouterLink } from '@angular/router';
         </div>
       </div>
 
-      <div class="landing-card">
-        <div class="mini-window">
-          <div class="window-dots"><i></i><i></i><i></i></div>
-          <p class="mini-label">YOUR WORKSPACE</p>
-          <h3>Welcome to NexaHub</h3>
-          <div class="mini-grid">
-            <div><strong>🧮</strong><span>Calculator</span></div>
-            <div><strong>💬</strong><span>Feedback</span></div>
-            <div><strong>📊</strong><span>Activity</span></div>
-            <div><strong>👤</strong><span>Profile</span></div>
-          </div>
-        </div>
-      </div>
-    </section>
 
     <section class="feature-strip">
       <article><span>01</span><h3>Simple</h3><p>Clean navigation and focused services.</p></article>

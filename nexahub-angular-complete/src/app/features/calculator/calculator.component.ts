@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, HostListener, inject } from '@angular/core';
 import { CalculatorService } from '../../core/services/calculator.service';
 import { ActivityService } from '../../core/services/activity.service';
 
@@ -18,6 +18,9 @@ import { ActivityService } from '../../core/services/activity.service';
           <div class="display">
             <div class="expression">{{ expression || '0' }}</div>
             <div class="result">{{ display }}</div>
+            <div class="keyboard-hint">
+  Keyboard supported · 0–9 · + − × ÷ · Enter · Backspace · Esc
+</div>
           </div>
 
           <div class="calc-grid">
@@ -75,7 +78,69 @@ export class CalculatorComponent {
   private waitingForSecond = false;
 
   history: { expression: string; result: string }[] = [];
+@HostListener('document:keydown', ['$event'])
+handleKeyboard(event: KeyboardEvent): void {
+  const key = event.key;
 
+  if (/^[0-9]$/.test(key)) {
+    event.preventDefault();
+    this.press(key);
+    return;
+  }
+
+  if (key === '.') {
+    event.preventDefault();
+    this.press('.');
+    return;
+  }
+
+  if (key === '+') {
+    event.preventDefault();
+    this.choose('+');
+    return;
+  }
+
+  if (key === '-') {
+    event.preventDefault();
+    this.choose('-');
+    return;
+  }
+
+  if (key === '*' || key.toLowerCase() === 'x') {
+    event.preventDefault();
+    this.choose('×');
+    return;
+  }
+
+  if (key === '/') {
+    event.preventDefault();
+    this.choose('÷');
+    return;
+  }
+
+  if (key === '%') {
+    event.preventDefault();
+    this.choose('%');
+    return;
+  }
+
+  if (key === 'Enter' || key === '=') {
+    event.preventDefault();
+    this.equals();
+    return;
+  }
+
+  if (key === 'Backspace' || key === 'Delete') {
+    event.preventDefault();
+    this.deleteLast();
+    return;
+  }
+
+  if (key === 'Escape') {
+    event.preventDefault();
+    this.clear();
+  }
+}
   press(value: string): void {
     this.error = '';
 
@@ -90,24 +155,26 @@ export class CalculatorComponent {
     this.display = this.display === '0' && value !== '.' ? value : this.display + value;
   }
 
-  choose(operator: string): void {
-    if (operator === '%') {
-      this.display = String(Number(this.display) / 100);
-      return;
-    }
+ choose(operator: string): void {
+  this.error = '';
 
-    const current = Number(this.display);
-
-    if (this.first !== null && this.operator && !this.waitingForSecond) {
-      this.calculate();
-    } else {
-      this.first = current;
-    }
-
-    this.operator = operator;
-    this.expression = `${this.first} ${operator}`;
-    this.waitingForSecond = true;
+  if (operator === '%') {
+    this.display = String(Number(this.display) / 100);
+    return;
   }
+
+  const current = Number(this.display);
+
+  if (this.first !== null && this.operator && !this.waitingForSecond) {
+    this.calculate();
+  } else if (this.first === null) {
+    this.first = current;
+  }
+
+  this.operator = operator;
+  this.expression = `${this.first} ${operator}`;
+  this.waitingForSecond = true;
+}
 
   equals(): void {
     if (this.first === null || !this.operator) return;
